@@ -1,0 +1,30 @@
+name: Continuous integration
+on: [push]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Install golangci-lint
+        run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sudo sh -s -- -b /usr/local/bin v1.18.0
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: go get -v -t -d ./...
+
+      - name: Lint
+        run: make lint
+
+      - name: Build
+        run: make build -j3
+
+      - name: Test
+        run: make test
